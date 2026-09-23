@@ -7,8 +7,12 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   packages: write
+
+concurrency:
+  group: caddy-publish
+  cancel-in-progress: false
 
 jobs:
   build:
@@ -18,8 +22,18 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Read Caddy image version
+        run: |
+          if [[ "${{ github.event_name }}" != "pull_request" && "${{ github.ref }}" == "refs/heads/main" ]]; then
+            git fetch origin main
+            version="$(git show origin/main:caddyversion.number)"
+          else
+            version="$(cat caddyversion.number)"
+          fi
+          echo "CADDY_IMAGE_VERSION=$version" >> "$GITHUB_ENV"
+
       - name: Build Caddy image
-        run: docker build -t ghcr.io/martesi/caddy:latest caddy
+        run: docker build -t "ghcr.io/martesi/caddy:${CADDY_IMAGE_VERSION}" caddy
 
       - name: Publish Caddy image
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
@@ -27,4 +41,16 @@ jobs:
           GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "$GHCR_TOKEN" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
-          docker push ghcr.io/martesi/caddy:latest
+          docker push "ghcr.io/martesi/caddy:${CADDY_IMAGE_VERSION}"
+
+      - name: Advance Caddy image version
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        run: |
+          git fetch origin main
+          git checkout -B main origin/main
+          printf '%s\n' "$((CADDY_IMAGE_VERSION + 1))" > caddyversion.number
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add caddyversion.number
+          git commit -m "chore: advance caddy image version [skip ci]"
+          git push origin main
