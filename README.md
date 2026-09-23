@@ -1,18 +1,15 @@
 # pkgs
 
-Custom Nix packages and OCI images.
+Custom OCI images.
 
 ## Outputs
 
-- `packages.x86_64-linux.caddy` — Caddy OCI image with Cloudflare DNS and OIDC plugins.
-- `packages.x86_64-linux.tunnel-client` — pinned OpenAI tunnel-client runtime.
+- `caddy/Dockerfile` — official Caddy Alpine image with Cloudflare DNS and OIDC plugins.
 
 ## Development
 
 ```sh
-direnv allow
-nix flake check
-./scripts/update.sh
+docker build -t custom/caddy caddy
 ```
 
-The scheduled GitHub Actions workflow refreshes release pins, verifies both outputs, commits changed pins, and publishes Caddy to `ghcr.io/martesi/caddy:latest`.
+Renovate updates the Caddy and plugin versions in `caddy/Dockerfile`.
