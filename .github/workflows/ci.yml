@@ -41,6 +41,18 @@ jobs:
           docker build -t "ghcr.io/martesi/caddy:${CADDY_IMAGE_VERSION}" caddy
           docker build -t "ghcr.io/martesi/agentdock:${AGENTDOCK_IMAGE_VERSION}" agentdock
 
+      - name: Validate AgentDock Nix
+        run: |
+          image="ghcr.io/martesi/agentdock:${AGENTDOCK_IMAGE_VERSION}"
+          docker run --rm --entrypoint sh "$image" -lc '
+            test "$(id -un)" = agentdock
+            test -d /nix/store
+            nix --version
+            nix store info
+            nix profile install nixpkgs#hello
+            hello
+          '
+
       - name: Publish images
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
         env:

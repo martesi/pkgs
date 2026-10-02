@@ -7,19 +7,17 @@ FROM docker.io/nixos/nix:${NIX_VERSION} AS nix
 FROM ghcr.io/uvwt/agentdock:${AGENTDOCK_VERSION}
 
 USER root
-COPY --from=nix /nix /opt/nix-bootstrap
-RUN nix_bin="$(find /opt/nix-bootstrap/store -path '*/bin/nix' -type f -print -quit)" \
+COPY --chown=agentdock:agentdock --from=nix /nix /nix
+RUN nix_bin="$(find /nix/store -path '*/bin/nix' -type f -print -quit)" \
     && test -n "$nix_bin" \
-    && nix_target="/nix${nix_bin#/opt/nix-bootstrap}" \
     && for command in \
          nix nix-build nix-channel nix-collect-garbage nix-copy-closure nix-daemon \
          nix-env nix-hash nix-instantiate nix-prefetch-url nix-shell nix-store; do \
-         ln -s "$nix_target" "/usr/local/bin/$command"; \
-         test "$(readlink "/usr/local/bin/$command")" = "$nix_target"; \
+         ln -s "$nix_bin" "/usr/local/bin/$command"; \
+         test "$(readlink "/usr/local/bin/$command")" = "$nix_bin"; \
        done \
-    && ln -s /opt/nix-bootstrap /nix \
     && nix --version \
     && nix-shell --version \
-    && nix-env --version \
-    && rm /nix
+    && nix-env --version
+ENV NIX_CONFIG="experimental-features = nix-command flakes"
 USER agentdock:agentdock
