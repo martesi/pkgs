@@ -10,9 +10,14 @@ USER root
 COPY --from=nix /nix /opt/nix-bootstrap
 RUN nix_bin="$(find /opt/nix-bootstrap/store -path '*/bin/nix' -type f -print -quit)" \
     && test -n "$nix_bin" \
-    && nix_target="/nix${nix_bin#/opt/nix-bootstrap}" \
-    && ln -s "$nix_target" /usr/local/bin/nix \
+    && nix_bin_dir="$(dirname "$nix_bin")" \
+    && for command in "$nix_bin_dir"/*; do \
+         ln -s "/nix${command#/opt/nix-bootstrap}" "/usr/local/bin/$(basename "$command")"; \
+       done \
     && ln -s /opt/nix-bootstrap /nix \
-    && /usr/local/bin/nix --version \
+    && nix --version \
+    && nix-shell --version \
+    && nix-env --version \
+    && nix-store --version \
     && rm /nix
 USER agentdock:agentdock
