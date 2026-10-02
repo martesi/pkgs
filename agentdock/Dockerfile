@@ -18,8 +18,8 @@ RUN nix_bin="$(find /nix/store -path '*/bin/nix' -type f -print -quit)" \
          test "$(readlink "/usr/local/bin/$command")" = "$nix_bin"; \
        done \
     && NIX_CONFIG="experimental-features = nix-command flakes" nix profile add --profile /nix/var/nix/profiles/agentdock \
-         "github:NixOS/nixpkgs/${NIXPKGS_REV}#jujutsu" \
-         "github:NixOS/nixpkgs/${NIXPKGS_REV}#bun" \
+         "tarball+https://github.com/NixOS/nixpkgs/archive/${NIXPKGS_REV}.tar.gz#jujutsu" \
+         "tarball+https://github.com/NixOS/nixpkgs/archive/${NIXPKGS_REV}.tar.gz#bun" \
     && for command in jj bun; do \
          ln -sf "/nix/var/nix/profiles/agentdock/bin/$command" "/usr/local/bin/$command"; \
        done \
