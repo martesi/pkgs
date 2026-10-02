@@ -20,6 +20,7 @@ RUN nix_bin="$(find /nix/store -path '*/bin/nix' -type f -print -quit)" \
     && NIX_CONFIG="experimental-features = nix-command flakes" nix profile add --profile /nix/var/nix/profiles/agentdock \
          "tarball+https://github.com/NixOS/nixpkgs/archive/${NIXPKGS_REV}.tar.gz#jujutsu" \
          "tarball+https://github.com/NixOS/nixpkgs/archive/${NIXPKGS_REV}.tar.gz#bun" \
+    && chown -R agentdock:agentdock /nix/var/nix \
     && for command in jj bun; do \
          ln -sf "/nix/var/nix/profiles/agentdock/bin/$command" "/usr/local/bin/$command"; \
        done \
