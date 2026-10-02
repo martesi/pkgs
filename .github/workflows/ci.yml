@@ -49,8 +49,8 @@ jobs:
             test -d /nix/store
             nix --version
             nix store info
-            nix profile install nixpkgs#hello
-            hello
+            nix profile add nixpkgs#hello
+            "$HOME/.nix-profile/bin/hello"
           '
 
       - name: Publish images
