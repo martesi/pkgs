@@ -11,7 +11,7 @@ permissions:
   packages: write
 
 concurrency:
-  group: caddy-publish
+  group: image-publish
   cancel-in-progress: false
 
 jobs:
@@ -22,36 +22,45 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Read Caddy image version
+      - name: Read image versions
         run: |
           if [[ "${{ github.event_name }}" != "pull_request" && "${{ github.ref }}" == "refs/heads/main" ]]; then
             git fetch origin main
-            version="$(git show origin/main:caddy/manifest.json | jq -r .version)"
+            ref=origin/main
           else
-            version="$(jq -r .version caddy/manifest.json)"
+            ref=HEAD
           fi
-          echo "CADDY_IMAGE_VERSION=$version" >> "$GITHUB_ENV"
+          for image in caddy agentdock; do
+            version="$(git show "$ref:${image}/manifest.json" | jq -r .version)"
+            key="$(printf '%s' "$image" | tr '[:lower:]' '[:upper:]')_IMAGE_VERSION"
+            echo "${key}=${version}" >> "$GITHUB_ENV"
+          done
 
-      - name: Build Caddy image
-        run: docker build -t "ghcr.io/martesi/caddy:${CADDY_IMAGE_VERSION}" caddy
+      - name: Build images
+        run: |
+          docker build -t "ghcr.io/martesi/caddy:${CADDY_IMAGE_VERSION}" caddy
+          docker build -t "ghcr.io/martesi/agentdock:${AGENTDOCK_IMAGE_VERSION}" agentdock
 
-      - name: Publish Caddy image
+      - name: Publish images
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
         env:
           GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "$GHCR_TOKEN" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
           docker push "ghcr.io/martesi/caddy:${CADDY_IMAGE_VERSION}"
+          docker push "ghcr.io/martesi/agentdock:${AGENTDOCK_IMAGE_VERSION}"
 
-      - name: Advance Caddy image version
+      - name: Advance image versions
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
         run: |
           git fetch origin main
           git checkout -B main origin/main
           jq ".version = $((CADDY_IMAGE_VERSION + 1))" caddy/manifest.json > caddy/manifest.json.tmp
           mv caddy/manifest.json.tmp caddy/manifest.json
+          jq ".version = $((AGENTDOCK_IMAGE_VERSION + 1))" agentdock/manifest.json > agentdock/manifest.json.tmp
+          mv agentdock/manifest.json.tmp agentdock/manifest.json
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add caddy/manifest.json
-          git commit -m "chore: advance caddy image version [skip ci]"
+          git add caddy/manifest.json agentdock/manifest.json
+          git commit -m "chore: advance image versions [skip ci]"
           git push origin main
