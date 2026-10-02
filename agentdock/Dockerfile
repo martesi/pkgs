@@ -1,11 +1,11 @@
 # renovate: datasource=docker depName=nixos/nix versioning=docker
 ARG NIX_VERSION=2.35.2
-ARG NIXPKGS_REV=f45c6f04c2f013f004bf94e284e95d72898d9393
 # renovate: datasource=docker depName=ghcr.io/uvwt/agentdock versioning=docker
 ARG AGENTDOCK_VERSION=v0.9.1
 
 FROM docker.io/nixos/nix:${NIX_VERSION} AS nix
 FROM ghcr.io/uvwt/agentdock:${AGENTDOCK_VERSION}
+ARG NIXPKGS_REV=f45c6f04c2f013f004bf94e284e95d72898d9393
 
 USER root
 COPY --chown=agentdock:agentdock --from=nix /nix /nix
