@@ -7,9 +7,12 @@ ARG AGENTDOCK_VERSION=v0.9.1
 FROM ghcr.io/uvwt/agentdock:${AGENTDOCK_VERSION}
 
 USER root
-COPY --from=nix /nix /nix
-RUN nix_bin="$(find /nix/store -path '*/bin/nix' -type f -print -quit)" \
+COPY --from=nix /nix /opt/nix-bootstrap
+RUN nix_bin="$(find /opt/nix-bootstrap/store -path '*/bin/nix' -type f -print -quit)" \
     && test -n "$nix_bin" \
-    && ln -s "$nix_bin" /usr/local/bin/nix \
-    && /usr/local/bin/nix --version
+    && nix_target="/nix${nix_bin#/opt/nix-bootstrap}" \
+    && ln -s "$nix_target" /usr/local/bin/nix \
+    && ln -s /opt/nix-bootstrap /nix \
+    && /usr/local/bin/nix --version \
+    && rm /nix
 USER agentdock:agentdock
