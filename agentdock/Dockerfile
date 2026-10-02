@@ -15,11 +15,11 @@ RUN nix_bin="$(find /opt/nix-bootstrap/store -path '*/bin/nix' -type f -print -q
          nix nix-build nix-channel nix-collect-garbage nix-copy-closure nix-daemon \
          nix-env nix-hash nix-instantiate nix-prefetch-url nix-shell nix-store; do \
          ln -s "$nix_target" "/usr/local/bin/$command"; \
+         test "$(readlink "/usr/local/bin/$command")" = "$nix_target"; \
        done \
     && ln -s /opt/nix-bootstrap /nix \
     && nix --version \
     && nix-shell --version \
     && nix-env --version \
-    && nix-store --version \
     && rm /nix
 USER agentdock:agentdock
