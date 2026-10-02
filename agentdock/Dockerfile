@@ -10,9 +10,11 @@ USER root
 COPY --from=nix /nix /opt/nix-bootstrap
 RUN nix_bin="$(find /opt/nix-bootstrap/store -path '*/bin/nix' -type f -print -quit)" \
     && test -n "$nix_bin" \
-    && nix_bin_dir="$(dirname "$nix_bin")" \
-    && for command in "$nix_bin_dir"/*; do \
-         ln -s "/nix${command#/opt/nix-bootstrap}" "/usr/local/bin/$(basename "$command")"; \
+    && nix_target="/nix${nix_bin#/opt/nix-bootstrap}" \
+    && for command in \
+         nix nix-build nix-channel nix-collect-garbage nix-copy-closure nix-daemon \
+         nix-env nix-hash nix-instantiate nix-prefetch-url nix-shell nix-store; do \
+         ln -s "$nix_target" "/usr/local/bin/$command"; \
        done \
     && ln -s /opt/nix-bootstrap /nix \
     && nix --version \
