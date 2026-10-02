@@ -1,5 +1,6 @@
 # renovate: datasource=docker depName=nixos/nix versioning=docker
 ARG NIX_VERSION=2.35.2
+ARG NIXPKGS_REV=f45c6f04c2f013f004bf94e284e95d72898d9393
 # renovate: datasource=docker depName=ghcr.io/uvwt/agentdock versioning=docker
 ARG AGENTDOCK_VERSION=v0.9.1
 
@@ -16,8 +17,16 @@ RUN nix_bin="$(find /nix/store -path '*/bin/nix' -type f -print -quit)" \
          ln -s "$nix_bin" "/usr/local/bin/$command"; \
          test "$(readlink "/usr/local/bin/$command")" = "$nix_bin"; \
        done \
+    && NIX_CONFIG="experimental-features = nix-command flakes" nix profile add --profile /nix/var/nix/profiles/agentdock \
+         "github:NixOS/nixpkgs/${NIXPKGS_REV}#jujutsu" \
+         "github:NixOS/nixpkgs/${NIXPKGS_REV}#bun" \
+    && for command in jj bun; do \
+         ln -sf "/nix/var/nix/profiles/agentdock/bin/$command" "/usr/local/bin/$command"; \
+       done \
     && nix --version \
     && nix-shell --version \
-    && nix-env --version
+    && nix-env --version \
+    && jj --version \
+    && bun --version
 ENV NIX_CONFIG="experimental-features = nix-command flakes"
 USER agentdock:agentdock

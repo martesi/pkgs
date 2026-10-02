@@ -41,7 +41,7 @@ jobs:
           docker build -t "ghcr.io/martesi/caddy:${CADDY_IMAGE_VERSION}" caddy
           docker build -t "ghcr.io/martesi/agentdock:${AGENTDOCK_IMAGE_VERSION}" agentdock
 
-      - name: Validate AgentDock Nix
+      - name: Validate AgentDock toolchain
         run: |
           image="ghcr.io/martesi/agentdock:${AGENTDOCK_IMAGE_VERSION}"
           docker run --rm --entrypoint sh "$image" -lc '
@@ -49,6 +49,8 @@ jobs:
             test -d /nix/store
             nix --version
             nix store info
+            jj --version
+            bun --version
             nix profile add nixpkgs#hello
             "$HOME/.nix-profile/bin/hello"
           '
