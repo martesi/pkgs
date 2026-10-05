@@ -1,4 +1,12 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["customManagers:dockerfileVersions"]
+  "extends": ["customManagers:dockerfileVersions"],
+  "packageRules": [
+    {
+      "matchDepNames": ["c0re100/qBittorrent-Enhanced-Edition"],
+      "automerge": true,
+      "automergeType": "pr",
+      "platformAutomerge": false
+    }
+  ]
 }

@@ -1,9 +1,15 @@
-name: CI
+name: AgentDock
 
 on:
   push:
     branches: [main]
+    paths:
+      - "agentdock/**"
+      - ".github/workflows/agentdock.yml"
   pull_request:
+    paths:
+      - "agentdock/**"
+      - ".github/workflows/agentdock.yml"
   workflow_dispatch:
 
 permissions:
@@ -11,7 +17,7 @@ permissions:
   packages: write
 
 concurrency:
-  group: image-publish
+  group: agentdock-publish
   cancel-in-progress: false
 
 jobs:
@@ -22,7 +28,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Read image versions
+      - name: Read image version
         run: |
           if [[ "${{ github.event_name }}" != "pull_request" && "${{ github.ref }}" == "refs/heads/main" ]]; then
             git fetch origin main
@@ -30,20 +36,14 @@ jobs:
           else
             ref=HEAD
           fi
-          for image in caddy agentdock; do
-            version="$(git show "$ref:${image}/manifest.json" | jq -r .version)"
-            key="$(printf '%s' "$image" | tr '[:lower:]' '[:upper:]')_IMAGE_VERSION"
-            echo "${key}=${version}" >> "$GITHUB_ENV"
-          done
+          echo "IMAGE_VERSION=$(git show "$ref:agentdock/manifest.json" | jq -r .version)" >> "$GITHUB_ENV"
 
-      - name: Build images
-        run: |
-          docker build -t "ghcr.io/martesi/caddy:${CADDY_IMAGE_VERSION}" caddy
-          docker build -t "ghcr.io/martesi/agentdock:${AGENTDOCK_IMAGE_VERSION}" agentdock
+      - name: Build image
+        run: docker build -t "ghcr.io/martesi/agentdock:${IMAGE_VERSION}" agentdock
 
-      - name: Validate AgentDock toolchain
+      - name: Validate toolchain
         run: |
-          image="ghcr.io/martesi/agentdock:${AGENTDOCK_IMAGE_VERSION}"
+          image="ghcr.io/martesi/agentdock:${IMAGE_VERSION}"
           docker run --rm --entrypoint sh "$image" -lc '
             test "$(id -un)" = agentdock
             test -d /nix/store
@@ -55,26 +55,23 @@ jobs:
             "$HOME/.nix-profile/bin/hello"
           '
 
-      - name: Publish images
+      - name: Publish image
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
         env:
           GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "$GHCR_TOKEN" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
-          docker push "ghcr.io/martesi/caddy:${CADDY_IMAGE_VERSION}"
-          docker push "ghcr.io/martesi/agentdock:${AGENTDOCK_IMAGE_VERSION}"
+          docker push "ghcr.io/martesi/agentdock:${IMAGE_VERSION}"
 
-      - name: Advance image versions
+      - name: Advance image version
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
         run: |
           git fetch origin main
           git checkout -B main origin/main
-          jq ".version = $((CADDY_IMAGE_VERSION + 1))" caddy/manifest.json > caddy/manifest.json.tmp
-          mv caddy/manifest.json.tmp caddy/manifest.json
-          jq ".version = $((AGENTDOCK_IMAGE_VERSION + 1))" agentdock/manifest.json > agentdock/manifest.json.tmp
+          jq ".version = $((IMAGE_VERSION + 1))" agentdock/manifest.json > agentdock/manifest.json.tmp
           mv agentdock/manifest.json.tmp agentdock/manifest.json
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add caddy/manifest.json agentdock/manifest.json
-          git commit -m "chore: advance image versions [skip ci]"
+          git add agentdock/manifest.json
+          git commit -m "chore: advance agentdock image version [skip ci]"
           git push origin main

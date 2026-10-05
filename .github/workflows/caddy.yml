@@ -1,0 +1,63 @@
+name: Caddy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "caddy/**"
+      - ".github/workflows/caddy.yml"
+  pull_request:
+    paths:
+      - "caddy/**"
+      - ".github/workflows/caddy.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  packages: write
+
+concurrency:
+  group: caddy-publish
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Read image version
+        run: |
+          if [[ "${{ github.event_name }}" != "pull_request" && "${{ github.ref }}" == "refs/heads/main" ]]; then
+            git fetch origin main
+            ref=origin/main
+          else
+            ref=HEAD
+          fi
+          echo "IMAGE_VERSION=$(git show "$ref:caddy/manifest.json" | jq -r .version)" >> "$GITHUB_ENV"
+
+      - name: Build image
+        run: docker build -t "ghcr.io/martesi/caddy:${IMAGE_VERSION}" caddy
+
+      - name: Publish image
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        env:
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "$GHCR_TOKEN" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          docker push "ghcr.io/martesi/caddy:${IMAGE_VERSION}"
+
+      - name: Advance image version
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        run: |
+          git fetch origin main
+          git checkout -B main origin/main
+          jq ".version = $((IMAGE_VERSION + 1))" caddy/manifest.json > caddy/manifest.json.tmp
+          mv caddy/manifest.json.tmp caddy/manifest.json
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add caddy/manifest.json
+          git commit -m "chore: advance caddy image version [skip ci]"
+          git push origin main

@@ -1,0 +1,54 @@
+name: qBittorrent Enhanced Edition
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "qbittorrentee/**"
+      - ".github/workflows/qbittorrentee.yml"
+  pull_request:
+    paths:
+      - "qbittorrentee/**"
+      - ".github/workflows/qbittorrentee.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: qbittorrentee-publish
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Read upstream version
+        run: |
+          version="$(sed -n 's/^ARG QBITTORRENT_VERSION=//p' qbittorrentee/Dockerfile | head -n1)"
+          test -n "$version"
+          echo "QBITTORRENT_VERSION=$version" >> "$GITHUB_ENV"
+
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and publish
+        uses: docker/build-push-action@v6
+        with:
+          context: qbittorrentee
+          platforms: linux/amd64,linux/arm64
+          push: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
+          tags: |
+            ghcr.io/martesi/qbittorrentee:${{ env.QBITTORRENT_VERSION }}
+            ghcr.io/martesi/qbittorrentee:latest
