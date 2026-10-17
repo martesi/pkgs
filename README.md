@@ -21,3 +21,14 @@ docker build -t custom/qbittorrentee qbittorrentee
 Each image has its own CI workflow. Caddy and AgentDock use numeric GHCR tags and advance their manifests after a successful publish.
 
 qBittorrent Enhanced Edition tracks the upstream GitHub release directly. Renovate updates and automerges its version after CI passes; CI publishes `ghcr.io/martesi/qbittorrentee:<upstream-version>` and `latest`.
+
+## Dependency updates
+
+Enable the Renovate GitHub app for this repository and select Interactive mode
+in the Mend Developer Portal; Silent mode only looks up updates. `renovate.json`
+enables a Dependency Dashboard. Renovate merges PRs after their checks
+pass; failed update PRs are assigned to `martesi`. Merging a Dockerfile or image
+workflow update to `main` triggers the corresponding image build and publish.
+
+If updates stop, check the Dependency Dashboard and the
+[Renovate job logs](https://developer.mend.io/).
