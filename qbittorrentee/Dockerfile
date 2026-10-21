@@ -1,5 +1,5 @@
 # renovate: datasource=docker depName=alpine versioning=docker
-ARG ALPINE_VERSION=3.22
+ARG ALPINE_VERSION=3.24
 # renovate: datasource=github-releases depName=c0re100/qBittorrent-Enhanced-Edition extractVersion=^release-(?<version>.*)$
 ARG QBITTORRENT_VERSION=5.2.4.10
 
