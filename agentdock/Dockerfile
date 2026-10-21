@@ -2,10 +2,14 @@ ARG NIX_VERSION=2.35.3
 ARG AGENTDOCK_VERSION=v1.1.0
 
 FROM docker.io/nixos/nix:${NIX_VERSION} AS nix
+FROM docker.io/library/node:22.23.4-bookworm-slim AS patched-node
 FROM ghcr.io/uvwt/agentdock:${AGENTDOCK_VERSION}
 ARG NIXPKGS_REV=f45c6f04c2f013f004bf94e284e95d72898d9393
 
 USER root
+# Replace the outdated Node runtime in the upstream AgentDock image.
+COPY --from=patched-node /usr/local/bin/node /usr/local/bin/node
+RUN node --version | grep -Fx v22.23.4
 COPY --chown=agentdock:agentdock --from=nix /nix /nix
 RUN nix_bin="$(find /nix/store -path '*/bin/nix' -type f -print -quit)" \
     && test -n "$nix_bin" \
