@@ -1,5 +1,5 @@
 # renovate: datasource=docker depName=nixos/nix versioning=docker
-ARG NIX_VERSION=2.35.2
+ARG NIX_VERSION=2.35.3
 # renovate: datasource=docker depName=ghcr.io/uvwt/agentdock versioning=docker
 ARG AGENTDOCK_VERSION=v1.1.0
 
