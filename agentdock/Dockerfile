@@ -1,5 +1,5 @@
 ARG NIX_VERSION=2.35.4
-ARG AGENTDOCK_VERSION=v1.1.0
+ARG AGENTDOCK_VERSION=v1.1.1
 
 FROM docker.io/nixos/nix:${NIX_VERSION} AS nix
 FROM docker.io/library/node:22.23.4-bookworm-slim AS patched-node
