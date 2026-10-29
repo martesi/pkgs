@@ -2,7 +2,7 @@ ARG NIX_VERSION=2.35.4
 ARG AGENTDOCK_VERSION=v1.1.1
 
 FROM docker.io/nixos/nix:${NIX_VERSION} AS nix
-FROM docker.io/library/node:22.23.4-bookworm-slim AS patched-node
+FROM docker.io/library/node:26.13.0-bookworm-slim AS patched-node
 FROM ghcr.io/uvwt/agentdock:${AGENTDOCK_VERSION}
 ARG NIXPKGS_REV=f45c6f04c2f013f004bf94e284e95d72898d9393
 
