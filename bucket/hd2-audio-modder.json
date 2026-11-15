@@ -1,0 +1,40 @@
+{
+    "version": "1.20.2",
+    "description": "Helldivers 2 audio and text modding tool",
+    "homepage": "https://github.com/RaidingForPants/hd2-audio-modder",
+    "license": "MIT",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/RaidingForPants/hd2-audio-modder/releases/download/v1.20.2/v1.20.2.Windows.zip",
+            "hash": "2c1176e5da57dc7901ff5e26a8c6e217d98968c1b1aa18824fce509fc804f052"
+        }
+    },
+    "persist": [
+        "config.pickle",
+        "friendlynames.db",
+        "log.txt",
+        "log.txt.1",
+        "log.txt.2"
+    ],
+    "pre_install": "foreach ($file in @('config.pickle', 'friendlynames.db', 'log.txt', 'log.txt.1', 'log.txt.2')) { $source = Join-Path $dir $file; $target = Join-Path $persist_dir $file; if (-not (Test-Path -LiteralPath $target)) { New-Item -ItemType File -Path $source -Force | Out-Null } }",
+    "post_install": "foreach ($file in @('config.pickle', 'friendlynames.db', 'log.txt', 'log.txt.1', 'log.txt.2')) { $source = Join-Path $dir $file; $target = Join-Path $persist_dir $file; if (Test-Path -LiteralPath $target -PathType Leaf) { $item = Get-Item -LiteralPath $target; if ($item.Length -eq 0) { if (Test-Path -LiteralPath $source) { Remove-Item -LiteralPath $source -Force }; Remove-Item -LiteralPath $target -Force } } }",
+    "pre_uninstall": "foreach ($file in @('config.pickle', 'friendlynames.db', 'log.txt', 'log.txt.1', 'log.txt.2')) { $source = Join-Path $dir $file; $target = Join-Path $persist_dir $file; if (Test-Path -LiteralPath $source -PathType Leaf) { $item = Get-Item -LiteralPath $source; if (-not (Test-Path -LiteralPath $target) -or $item.LinkType -ne 'HardLink') { New-Item -ItemType Directory -Path (Split-Path $target) -Force | Out-Null; Copy-Item -LiteralPath $source -Destination $target -Force } } }",
+    "bin": "audio_modder.exe",
+    "shortcuts": [
+        [
+            "audio_modder.exe",
+            "HD2 Audio Modder"
+        ]
+    ],
+    "checkver": "github",
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/RaidingForPants/hd2-audio-modder/releases/download/v$version/v$version.Windows.zip"
+            }
+        },
+        "hash": {
+            "mode": "github"
+        }
+    }
+}

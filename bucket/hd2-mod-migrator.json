@@ -1,0 +1,30 @@
+{
+    "version": "1.2.0",
+    "description": "Helldivers 2 desktop tool for migrating and updating appearance mods",
+    "homepage": "https://github.com/eigeen/hd2-mod-crates",
+    "license": "Unknown",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/eigeen/hd2-mod-crates/releases/download/v1.2.0/hd2-mod-tools-desktop-x86_64-pc-windows-msvc-v1.2.0.zip",
+            "hash": "dcc144e2267e2dc5d2f1e0af50896393df48b2addfbc0b75db40d9e6542ed7c5"
+        }
+    },
+    "bin": "hd2_migrator_desktop.exe",
+    "shortcuts": [
+        [
+            "hd2_migrator_desktop.exe",
+            "HD2 Mod Migrator"
+        ]
+    ],
+    "checkver": "github",
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/eigeen/hd2-mod-crates/releases/download/v$version/hd2-mod-tools-desktop-x86_64-pc-windows-msvc-v$version.zip"
+            }
+        },
+        "hash": {
+            "mode": "github"
+        }
+    }
+}

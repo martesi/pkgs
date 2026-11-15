@@ -28,3 +28,22 @@ workflow update to `main` triggers the corresponding image build and publish.
 
 If updates stop, check the Dependency Dashboard and the
 [Renovate job logs](https://developer.mend.io/).
+
+## Martesi Scoop bucket
+
+Scoop manifests for portable Windows tools used by the Martesi Helldivers 2
+tooling workflow, plus Argus.
+
+## Install
+
+```powershell
+scoop bucket add martesi https://github.com/martesi/pkgs
+scoop install martesi/argus
+scoop install martesi/hd2-mod-quick-deploy
+scoop install martesi/hd2-mod-setting-gui
+scoop install martesi/hd2-mod-migrator
+scoop install martesi/hd2-audio-modder
+```
+
+The bucket's scheduled Excavator workflow checks upstream GitHub releases every
+four hours and commits manifest updates when versions or asset hashes change.

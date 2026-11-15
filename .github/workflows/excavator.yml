@@ -1,0 +1,26 @@
+name: Excavator
+
+on:
+  schedule:
+    - cron: '20 */4 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: excavator
+  cancel-in-progress: false
+
+jobs:
+  excavate:
+    name: Update Scoop manifests
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Excavate
+        uses: ScoopInstaller/GithubActions@main
+        env:
+          SKIP_UPDATED: 1
