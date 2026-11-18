@@ -1,0 +1,39 @@
+{
+    "version": "0.3.2",
+    "description": "Desktop mod manager",
+    "homepage": "https://github.com/martesi/modkeeper",
+    "license": "MIT",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/martesi/modkeeper/releases/download/v0.3.2/Modkeeper_0.3.2_x64-setup.exe",
+            "hash": "68252d1982e5cbedf2949da1ad3569e31167b4a9dce897094c3075dc93dac40f"
+        },
+        "arm64": {
+            "url": "https://github.com/martesi/modkeeper/releases/download/v0.3.2/Modkeeper_0.3.2_arm64-setup.exe",
+            "hash": "e5939859286de97c21bdce325a094bfbf8fcaccf2d0ae94f0728144ea15d77b2"
+        }
+    },
+    "installer": {
+        "args": [
+            "/S",
+            "/D=$dir"
+        ]
+    },
+    "checkver": {
+        "github": "https://github.com/martesi/modkeeper",
+        "regex": "v([\\d.]+)"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/martesi/modkeeper/releases/download/v$version/Modkeeper_$version_x64-setup.exe"
+            },
+            "arm64": {
+                "url": "https://github.com/martesi/modkeeper/releases/download/v$version/Modkeeper_$version_arm64-setup.exe"
+            }
+        },
+        "hash": {
+            "mode": "download"
+        }
+    }
+}
