@@ -1,16 +1,16 @@
 {
-    "version": "2026.3.3.1",
+    "version": "2026.3.4.1",
     "description": "UniGetUI Classic - portable Windows package manager GUI",
     "homepage": "https://github.com/martesi/UniGetUI",
     "license": "MIT",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/martesi/UniGetUI/releases/download/v2026.3.3.1/UniGetUI.Installer.x64.exe",
-            "hash": "543c9fcef00e2653baf8fe4aec0e46a1fdbc2f5206c9db7cc0aec87e79d9d616"
+            "url": "https://github.com/martesi/UniGetUI/releases/download/v2026.3.4.1/UniGetUI.Installer.x64.exe",
+            "hash": "3616a730a5615cddcb9257ca0c4e289e4dd63afba7429bdff310a72d2a75598e"
         },
         "arm64": {
-            "url": "https://github.com/martesi/UniGetUI/releases/download/v2026.3.3.1/UniGetUI.Installer.arm64.exe",
-            "hash": "15f6e28fb9d2019d2c0b394adc72a86065e6a0aa2a55f7fb1c9304ae5c9b9165"
+            "url": "https://github.com/martesi/UniGetUI/releases/download/v2026.3.4.1/UniGetUI.Installer.arm64.exe",
+            "hash": "6d0a7276b7b8c9662ffbab577057e8281b0620b937dc8e0df190256ac03c43cc"
         }
     },
     "installer": {
@@ -24,9 +24,7 @@
             "/NoAutoStart"
         ]
     },
-    "persist": [
-        "Settings"
-    ],
+    "persist": "Settings",
     "shortcuts": [
         [
             "UniGetUI.exe",
