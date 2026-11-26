@@ -1,12 +1,12 @@
 {
-    "version": "1.20.2",
+    "version": "1.21.0",
     "description": "Windows settings editor for compatible Helldivers 2 mods",
     "homepage": "https://github.com/pat-pat-patrick/hd2-mod-setting-gui",
     "license": "MIT",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/pat-pat-patrick/hd2-mod-setting-gui/releases/download/v1.20.2/HD2.Mod.Setting.GUI.exe",
-            "hash": "0ec779cf8ace5695353259bf95a14f019eb549afe6f05f8cb592c8913cf3d039"
+            "url": "https://github.com/pat-pat-patrick/hd2-mod-setting-gui/releases/download/v1.21.0/HD2.Mod.Setting.GUI.exe",
+            "hash": "dd8c9acaf20f8cb8e4c08f3b7ade78e2a8bb266ab3c45e74e7b17f02401308c9"
         }
     },
     "bin": "HD2.Mod.Setting.GUI.exe",
