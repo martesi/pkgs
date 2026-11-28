@@ -1,12 +1,12 @@
 {
-    "version": "0.25.0-dev",
+    "version": "0.26.0-dev",
     "description": "Incremental Helldivers 2 mod manager and deployer",
     "homepage": "https://github.com/pat-pat-patrick/hd2-mod-cli",
     "license": "MIT",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/pat-pat-patrick/hd2-mod-cli/releases/download/v0.25.0-dev/HD2.Mod.Quick.Deploy.exe",
-            "hash": "9606af9e146212c3d2ff313fbd386bab8b498ce8778d760dc0d8cfc18253507e"
+            "url": "https://github.com/pat-pat-patrick/hd2-mod-cli/releases/download/v0.26.0-dev/HD2.Mod.Quick.Deploy.exe",
+            "hash": "e79d35f53544e2a359027bd02fbd6cbdda4589899950ccb1bd0d2b70888601b0"
         }
     },
     "bin": "HD2.Mod.Quick.Deploy.exe",
